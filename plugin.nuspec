@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>com.castsoftware.uc.architecturecheckermodelgenerator</id>
+    <version>1.0.0</version>
+    <title>Architecture checker model generator</title>
+    <authors>User Community</authors>
+    <owners>CAST</owners>
+    <projectUrl>com.castsoftware.uc.architecturecheckermodelgenerator</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/CAST-Extend/com.castsoftware.uc.architecturecheckermodelgenerator/master/ac.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This extension allows to generate architecture checker models</description>
+    <releaseNotes>https://github.com/CAST-Extend/com.castsoftware.uc.architecturecheckermodelgenerator/wiki#version-100</releaseNotes>
+    <tags>CASTUserCommunity Quality</tags>
+    <dependencies>
+      <dependency id="CAIP" version="8.3" />
+    </dependencies>
+  </metadata>
+</package>
