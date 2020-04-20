@@ -1,3 +1,5 @@
+import sys
+from utils.utils import Utils
 from model.modelclasses import ArchitectureModel, MemberOf, Property,Layer, Criteria, ExcludedFrom, Link
 
 ##############################################################################################################
@@ -42,7 +44,17 @@ def create_app_specific_links(acmodel):
   
 if __name__ == '__main__':
 
-    acmodel = ArchitectureModel('simple model','simple model.CASTArchitect', ArchitectureModel.TYPE_FORBIDDEN, 'JEE,Cobol')
+    parser = Utils.init_parse_argument()
+    args = parser.parse_args()
+    outputfolder = '.' 
+    if args.outputfolder != None:
+        outputfolder = args.outputfolder
+    print('python version='+sys.version)
+    print('****************** params ******************')
+    print('outputfolder='+outputfolder)
+    print('********************************************')
+
+    acmodel = ArchitectureModel('simple model','simple model.CASTArchitect', ArchitectureModel.TYPE_FORBIDDEN, 'JEE,Cobol',outputfolder)
     create_app_specific_sets_and_layers(acmodel)
     create_app_specific_links(acmodel)
     acmodel.generate_model()

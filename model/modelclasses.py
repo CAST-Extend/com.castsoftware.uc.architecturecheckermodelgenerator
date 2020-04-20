@@ -17,7 +17,7 @@ class ArchitectureModel:
     # Constructor
     #TODO: Not working with deserialization, to be fixed
     #def __init__(self, layers, modelname:str ='Architecture checker model', filename:str ='Architecture checker model.CASTArchitect', ruleType:str = 'ForbiddenLinks', technology:str ='JEE'): 
-    def __init__(self, modelname:str ='Architecture checker model', filename:str ='Architecture checker model.CASTArchitect', ruleType:str = TYPE_FORBIDDEN, technologies:str ='JEE'): 
+    def __init__(self, modelname:str ='Architecture checker model', filename:str ='Architecture checker model.CASTArchitect', ruleType:str = TYPE_FORBIDDEN, technologies:str ='JEE', workfolder = '.'): 
         self.filename = filename
         self.modelname = modelname
         self.ruleType = ruleType
@@ -26,6 +26,7 @@ class ArchitectureModel:
         self.modelversion = '1.0.1.1'
         #TODO: Not working with deserialization, to be fixed
         #self.layers = layers
+        self.workfolder = workfolder
         self.layers = []
         self.links = []
         
@@ -97,7 +98,7 @@ class ArchitectureModel:
     ############################################################################################"
      
     def create_unassigned(self):
-        s=Layer(Layer.layer_UNASSIGNED, Layer.TYPE_LAYER, True, 220, 100)
+        s=Layer(Layer.layer_UNASSIGNED, Layer.TYPE_LAYER, False, 220, 100)
         self.add_layer(s)     
     ############################################################################################"
         
@@ -116,7 +117,7 @@ class ArchitectureModel:
                 ])
                 c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
                 c.add_property(p)
-                s=Layer(Layer.set_Java_Instantiated, Layer.TYPE_SET, True)
+                s=Layer(Layer.set_Java_Instantiated, Layer.TYPE_SET, False)
                 s.add_criteria(c)
                 self.add_layer(s)
             
@@ -126,7 +127,7 @@ class ArchitectureModel:
                 ])
                 c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
                 c.add_property(p)
-                s=Layer(Layer.set_Java_Properties_File, Layer.TYPE_SET, True)
+                s=Layer(Layer.set_Java_Properties_File, Layer.TYPE_SET, False)
                 s.add_criteria(c)
                 self.add_layer(s)
                 
@@ -140,41 +141,63 @@ class ArchitectureModel:
                 ])
                 c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
                 c.add_property(p)
-                s=Layer(Layer.set_CSharp_Instantiated, Layer.TYPE_SET, True)
+                s=Layer(Layer.set_CSharp_Instantiated, Layer.TYPE_SET, False)
                 s.add_criteria(c)
                 self.add_layer(s)
             if 'SQL' in self.technologies:
                 p=Property(Property.NAME_TYPE,Property.OP_EQUALS,[
-                    'SQLScriptEvent',
-                    'SQLScriptForeignKey',
-                    'SQLScriptFunction',
-                    'SQLScriptIndex',
-                    'SQLScriptMethod',
-                    'SQLScriptPackage',
-                    'SQLScriptProcedure',
-                    'SQLScriptSchema',
-                    'SQLScriptProject',
-                    'SQLScriptDML',
-                    'SQLScriptSynonym',
-                    'SQLScriptFunctionSynonym',
-                    'SQLScriptPackageSynonym',
-                    'SQLScriptProcedureSynonym',
-                    'SQLScriptTableSynonym',
-                    'SQLScriptTypeSynonym',
-                    'SQLScriptViewSynonym',
+                    'SQLScriptView',
                     'SQLScriptTable',
                     'SQLScriptTableColumn',
-                    'SQLScriptTrigger',
-                    'SQLScriptType',
+                    'SQLScriptViewSynonym',
+                    'SQLScriptTableSynonym',
+                    'SQLScriptIndex',
+                    'FormsScriptDataBlock',
+                    'FormsScriptDataBlockItem',
+                    'SQLScriptForeignKey',
                     'SQLScriptUniqueConstraint',
-                    'SQLScriptView',
                 ])
                 c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
                 c.add_property(p)
-                s=Layer(Layer.set_SQL_Database, Layer.TYPE_SET, True)
+                s=Layer(Layer.set_SQL_Database_Data, Layer.TYPE_SET, False)
                 s.add_criteria(c)
-                self.add_layer(s)                
+                self.add_layer(s)
                 
+                c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
+                c.add_memberofset(MemberOf(Layer.set_SQL_Database_Data))
+                s=Layer(Layer.layer_SQL_Database_Data, Layer.TYPE_LAYER, True)
+                s.add_criteria(c)
+                self.add_layer(s) 
+                
+                p=Property(Property.NAME_TYPE,Property.OP_EQUALS,[
+                    'SQLScriptEvent',
+                    'FormsScriptFunction',
+                    'FormsScriptModule',
+                    'FormsScriptPackage',
+                    'FormsScriptProcedure',
+                    'FormsScriptTrigger',
+                    'SQLScriptFunction',
+                    'SQLScriptPackage',
+                    'SQLScriptProcedure',
+                    'SQLScriptMethod',
+                    'SQLScriptMacro',
+                    'SQLScriptFunctionSynonym',
+                    'SQLScriptPackageSynonym',
+                    'SQLScriptProcedureSynonym',
+                    'SQLScriptTypeSynonym',
+                    'SQLScriptTrigger',  
+                ])
+                c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
+                c.add_property(p)
+                s=Layer(Layer.set_SQL_Database_Logic, Layer.TYPE_SET, False)
+                s.add_criteria(c)
+                self.add_layer(s)   
+                
+                c=Criteria(Criteria.TYPE_SELECTION_CRITERIA, True, True)
+                c.add_memberofset(MemberOf(Layer.set_SQL_Database_Logic))
+                s=Layer(Layer.layer_SQL_Database_Logic, Layer.TYPE_LAYER, True)
+                s.add_criteria(c)
+                self.add_layer(s) 
     ############################################################################################"    
     
     def get_file_criterias(self, c):
@@ -225,11 +248,10 @@ class ArchitectureModel:
         
     # create the file
     def create_file(self):
-        folder = "."
         currentdate = datetime.datetime.today()
         
         # layers.xml file
-        layers_path = os.path.join(folder, 'layers.xml')
+        layers_path = os.path.join(self.workfolder, 'layers.xml')
         fo = open(layers_path, "wt")
         fo.write("<sets name=\"Layers\" version=\"" + self.modelversion + "\" date=\""+ currentdate.ctime()+"\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"CAST-Sets.xsd\">\n");             
         strfile = ''
@@ -246,7 +268,7 @@ class ArchitectureModel:
         fo.close()           
 
         # archi_project.arm file
-        archi_project_path = os.path.join(folder, 'archi_project.arm')
+        archi_project_path = os.path.join(self.workfolder, 'archi_project.arm')
         fo2 = open(archi_project_path, "wt") 
         
 
@@ -266,7 +288,7 @@ class ArchitectureModel:
         fo2.close()
 
         # dependencies.xml
-        dependencies_path = os.path.join(folder, 'dependencies.xml')
+        dependencies_path = os.path.join(self.workfolder, 'dependencies.xml')
         fo3 = open(dependencies_path, "wt") 
                 
         fo3.write("<rules name=\"Rules\" version=\"" + self.modelversion + "\" date=\""+ currentdate.ctime()+"\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"CAST-Rules.xsd\">\n")
@@ -289,7 +311,7 @@ class ArchitectureModel:
         fo3.write("</rules>\n")
         fo3.close()
 
-        archi_model_path = os.path.join(folder, self.filename)
+        archi_model_path = os.path.join(self.workfolder, self.filename)
         
         z = zipfile.ZipFile(archi_model_path, "w") 
         z.write(archi_project_path)
@@ -298,7 +320,7 @@ class ArchitectureModel:
         z.close()
         
         self.loginfo("Generated Architecture Model file %s" % archi_model_path)
-        self.loginfo("Files are generated in %s" % os.getcwd())
+        self.loginfo("Files are generated in %s" % self.workfolder)
         
         os.remove(archi_project_path)
         #os.remove(layers_path)
@@ -402,7 +424,10 @@ class Layer:
     set_Java_Instantiated = 'set Java Instantiated'
     set_CSharp_Instantiated = 'set C# Instantiated'
     set_Java_Properties_File = 'set Java Properties File' 
-    set_SQL_Database = 'set Database'    
+    set_SQL_Database_Data = 'set Database Data'    
+    set_SQL_Database_Logic = 'set Database Logic' 
+    layer_SQL_Database_Data = 'Database - Data'
+    layer_SQL_Database_Logic = 'Database - Logic'
     
     # Constructor
     def __init__(self, layername, layertype, showOnView=False, width=220, height=100, x=50, y=50): 
